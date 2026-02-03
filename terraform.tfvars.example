@@ -1,0 +1,11 @@
+# Copy this file to terraform.tfvars and fill in your actual values
+# terraform.tfvars is gitignored to keep your values private
+
+# AWS Region (already set to eu-central-1 by default, but you can override)
+# aws_region = "eu-central-1"
+
+# Your domain name
+domain_name = "lopezberg.dev"
+
+# Instance type (t3.micro is free tier eligible)
+# instance_type = "t3.micro"
