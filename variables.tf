@@ -5,12 +5,12 @@ variable "aws_region" {
 }
 
 variable "domain_name" {
-  description = "Domain name for the portfolio (e.g., lopezberg.dev)"
+  description = "Domain name for the portfolio"
   type        = string
 }
 
 variable "instance_type" {
-  description = "EC2 instance type (t3.micro is free tier eligible)"
+  description = "EC2 instance type"
   type        = string
   default     = "t3.micro"
 
