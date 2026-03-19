@@ -14,7 +14,7 @@ output "domain_name" {
 }
 
 output "nameservers" {
-  description = "Route 53 nameservers (update these at your domain registrar)"
+  description = "Route 53 nameservers"
   value       = data.aws_route53_zone.portfolio.name_servers
 }
 
