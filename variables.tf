@@ -19,3 +19,8 @@ variable "instance_type" {
     error_message = "Instance type must be a t2 or t3 instance (nano, micro, small, or medium)."
   }
 }
+
+variable "vpc_id" {
+  description = "VPC ID where resources will be deployed"
+  type        = string
+}

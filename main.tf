@@ -74,6 +74,7 @@ resource "aws_iam_instance_profile" "portfolio_profile" {
 resource "aws_security_group" "portfolio_web_sg" {
   name        = "portfolio-web-sg"
   description = "Allow HTTP and HTTPS inbound, all outbound"
+  vpc_id      = var.vpc_id
 
   # HTTP
   ingress {
@@ -113,6 +114,10 @@ resource "aws_instance" "portfolio_web" {
   instance_type          = var.instance_type
   iam_instance_profile   = aws_iam_instance_profile.portfolio_profile.name
   vpc_security_group_ids = [aws_security_group.portfolio_web_sg.id]
+  
+  lifecycle {
+    ignore_changes = [ ami ]
+  }
 
   # Enable public IP in default VPC
   associate_public_ip_address = true
