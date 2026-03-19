@@ -21,10 +21,9 @@ provider "aws" {
   }
 }
 
-# Data source to get the latest Ubuntu 24.04 LTS AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical's AWS account ID
+  owners      = ["099720109477"]
 
   filter {
     name   = "name"
@@ -134,10 +133,9 @@ resource "aws_instance" "portfolio_web" {
     encrypted             = true
   }
 
-  # User data to ensure SSM agent is running (it should be by default on Ubuntu 24.04)
+  # User data
   user_data = <<-EOF
               #!/bin/bash
-              # Ensure SSM agent is running
               snap start amazon-ssm-agent
               snap restart amazon-ssm-agent
               EOF
@@ -157,8 +155,7 @@ resource "aws_eip" "portfolio_eip" {
   }
 }
 
-# Route 53 Hosted Zone (only create if it doesn't exist)
-# If you already have a hosted zone, you can import it or use data source
+# Route 53 Hosted Zone
 data "aws_route53_zone" "portfolio" {
   name = var.domain_name
 
