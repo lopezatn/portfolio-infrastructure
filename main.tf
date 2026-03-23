@@ -64,6 +64,11 @@ resource "aws_iam_role_policy_attachment" "ssm_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_role_policy_attachment" "container_registry_policy" {
+  role       = aws_iam_role.portfolio_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 # Instance profile to attach the role to EC2
 resource "aws_iam_instance_profile" "portfolio_profile" {
   name = "portfolio-ec2-profile"
