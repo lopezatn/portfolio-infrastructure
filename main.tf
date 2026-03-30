@@ -99,6 +99,16 @@ resource "aws_security_group" "portfolio_web_sg" {
     description = "Allow HTTPS from anywhere"
   }
 
+  # Health API Call
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow Health API calls from anywhere"
+  }
+
+
   # Allow all outbound
   egress {
     from_port   = 0
