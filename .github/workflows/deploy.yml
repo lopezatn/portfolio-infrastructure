@@ -1,0 +1,53 @@
+name: Portfolio infrastructure deploying automation
+
+on:
+  push:
+    branches:
+      - main
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  plan:
+    name: Plan the new terraform state to AWS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          role-session-name: portfolio-infrastructure-deploy
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.0
+      - name: Terraform init
+        run: terraform init
+      - name: Plan terraform changes
+        run: terraform plan
+  apply:
+    name: Apply the new terraform state to AWS
+    runs-on: ubuntu-latest
+    needs: plan
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          role-session-name: portfolio-infrastructure-deploy
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.0
+      - name: Terraform init
+        run: terraform init
+      - name: Apply terraform changes
+        run: terraform apply -auto-approve

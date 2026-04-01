@@ -36,7 +36,6 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# IAM Role for EC2 to use Systems Manager
 resource "aws_iam_role" "portfolio_ec2_role" {
   name = "portfolio-ec2-role"
 
@@ -58,7 +57,6 @@ resource "aws_iam_role" "portfolio_ec2_role" {
   }
 }
 
-# Attach AWS managed policy for Systems Manager
 resource "aws_iam_role_policy_attachment" "ssm_policy" {
   role       = aws_iam_role.portfolio_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -69,19 +67,16 @@ resource "aws_iam_role_policy_attachment" "container_registry_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-# Instance profile to attach the role to EC2
 resource "aws_iam_instance_profile" "portfolio_profile" {
   name = "portfolio-ec2-profile"
   role = aws_iam_role.portfolio_ec2_role.name
 }
 
-# Security Group - Only HTTP and HTTPS, NO SSH
 resource "aws_security_group" "portfolio_web_sg" {
   name        = "portfolio-web-sg"
   description = "Allow HTTP and HTTPS inbound, all outbound"
   vpc_id      = var.vpc_id
 
-  # HTTP
   ingress {
     from_port   = 80
     to_port     = 80
@@ -90,7 +85,6 @@ resource "aws_security_group" "portfolio_web_sg" {
     description = "Allow HTTP from anywhere"
   }
 
-  # HTTPS
   ingress {
     from_port   = 443
     to_port     = 443
@@ -99,7 +93,6 @@ resource "aws_security_group" "portfolio_web_sg" {
     description = "Allow HTTPS from anywhere"
   }
 
-  # Health API Call
   ingress {
     from_port   = 5000
     to_port     = 5000
@@ -109,7 +102,6 @@ resource "aws_security_group" "portfolio_web_sg" {
   }
 
 
-  # Allow all outbound
   egress {
     from_port   = 0
     to_port     = 0
@@ -123,7 +115,6 @@ resource "aws_security_group" "portfolio_web_sg" {
   }
 }
 
-# EC2 Instance
 resource "aws_instance" "portfolio_web" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
@@ -134,7 +125,6 @@ resource "aws_instance" "portfolio_web" {
     ignore_changes = [ ami ]
   }
 
-  # Enable public IP in default VPC
   associate_public_ip_address = true
 
   # Enforce IMDSv2 for security
