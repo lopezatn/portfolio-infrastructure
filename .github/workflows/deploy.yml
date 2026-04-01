@@ -29,6 +29,8 @@ jobs:
         run: terraform init
       - name: Plan terraform changes
         run: terraform plan
+        env:
+          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
   apply:
     name: Apply the new terraform state to AWS
     runs-on: ubuntu-latest
@@ -51,3 +53,5 @@ jobs:
         run: terraform init
       - name: Apply terraform changes
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
