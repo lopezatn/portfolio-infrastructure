@@ -7,6 +7,12 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  backend "s3" {
+    bucket = "lopezberg-terraform-state-343218214405-eu-central-1-an"
+    key    = "portfolio-web/terraform.tfstate"
+    region = "eu-central-1"
+  }
 }
 
 provider "aws" {
