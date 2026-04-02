@@ -195,3 +195,5 @@ resource "aws_route53_record" "portfolio_www" {
   ttl     = 300
   records = [aws_eip.portfolio_eip.public_ip]
 }
+
+#test
