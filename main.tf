@@ -180,7 +180,7 @@ resource "aws_instance" "portfolio_web" {
 
   tags = {
     Name = "portfolio-web-server"
-    "Patch Group" = "portfolio-production"
+    PatchGroup = "portfolio-production"
   }
 }
 
