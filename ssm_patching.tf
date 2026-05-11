@@ -76,7 +76,7 @@ resource "aws_ssm_maintenance_window_target" "portfolio_ec2" {
   resource_type = "INSTANCE"
 
   targets {
-    key    = "tag:Patch Group"
+    key    = "tag:PatchGroup"
     values = ["portfolio-production"]
   }
 }
