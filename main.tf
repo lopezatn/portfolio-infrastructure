@@ -63,6 +63,29 @@ resource "aws_iam_role" "portfolio_ec2_role" {
   }
 }
 
+resource "aws_iam_role_policy" "ec2_s3_scoped" {
+  name = "portfolio-ec2-s3-scoped"
+  role = aws_iam_role.portfolio_ec2_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "FrontendDeployRead"
+        Effect = "Allow"
+        Action = "s3:GetObject"
+        Resource = "arn:aws:s3:::lopezberg-portfolio-deploy/dist/*"
+      },
+      {
+        Sid    = "SSMLogsWrite"
+        Effect = "Allow"
+        Action = "s3:PutObject"
+        Resource = "arn:aws:s3:::lopezberg-portfolio-deploy/ssm-logs/*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "ssm_policy" {
   role       = aws_iam_role.portfolio_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -72,6 +95,7 @@ resource "aws_iam_role_policy_attachment" "container_registry_policy" {
   role       = aws_iam_role.portfolio_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
+
 
 resource "aws_iam_instance_profile" "portfolio_profile" {
   name = "portfolio-ec2-profile"
@@ -133,7 +157,6 @@ resource "aws_instance" "portfolio_web" {
 
   associate_public_ip_address = true
 
-  # Enforce IMDSv2 for security
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "required" # IMDSv2 only
@@ -141,7 +164,6 @@ resource "aws_instance" "portfolio_web" {
     instance_metadata_tags      = "enabled"
   }
 
-  # Root volume configuration
   root_block_device {
     volume_size           = 8
     volume_type           = "gp3"
@@ -162,7 +184,6 @@ resource "aws_instance" "portfolio_web" {
   }
 }
 
-# Elastic IP
 resource "aws_eip" "portfolio_eip" {
   instance = aws_instance.portfolio_web.id
   domain   = "vpc"
@@ -172,14 +193,12 @@ resource "aws_eip" "portfolio_eip" {
   }
 }
 
-# Route 53 Hosted Zone
 data "aws_route53_zone" "portfolio" {
   name = var.domain_name
 
   private_zone = false
 }
 
-# Route 53 A Record pointing to Elastic IP
 resource "aws_route53_record" "portfolio_a" {
   zone_id = data.aws_route53_zone.portfolio.zone_id
   name    = var.domain_name
@@ -188,7 +207,6 @@ resource "aws_route53_record" "portfolio_a" {
   records = [aws_eip.portfolio_eip.public_ip]
 }
 
-# Route 53 A Record for www subdomain
 resource "aws_route53_record" "portfolio_www" {
   zone_id = data.aws_route53_zone.portfolio.zone_id
   name    = "www.${var.domain_name}"
@@ -196,5 +214,3 @@ resource "aws_route53_record" "portfolio_www" {
   ttl     = 300
   records = [aws_eip.portfolio_eip.public_ip]
 }
-
-#test
