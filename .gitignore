@@ -29,3 +29,6 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# ignore any swp files created by vim
+*.swp
