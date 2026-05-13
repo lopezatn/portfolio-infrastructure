@@ -81,6 +81,12 @@ resource "aws_iam_role_policy" "ec2_s3_scoped" {
         Effect = "Allow"
         Action = "s3:PutObject"
         Resource = "arn:aws:s3:::lopezberg-portfolio-deploy/ssm-logs/*"
+      },
+      {
+        Sid    = "FrontendDeployList"
+        Effect = "Allow"
+        Action = "s3:ListBucket"
+        Resource = "arn:aws:s3:::lopezberg-portfolio-deploy"
       }
     ]
   })
@@ -171,7 +177,6 @@ resource "aws_instance" "portfolio_web" {
     encrypted             = true
   }
 
-  # User data
   user_data = <<-EOF
               #!/bin/bash
               snap start amazon-ssm-agent
