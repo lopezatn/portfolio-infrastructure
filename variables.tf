@@ -25,3 +25,8 @@ variable "vpc_id" {
   description = "VPC ID where resources will be deployed"
   type        = string
 }
+
+variable "github_actions_ssm_policy_arn" {
+  description = "ARN of the scoped SSM policy for GitHub Actions"
+  type        = string
+}
