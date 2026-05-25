@@ -134,7 +134,8 @@ data "aws_iam_policy_document" "github_actions_terraform_policy" {
       "ec2:RevokeSecurityGroupIngress", "ec2:RevokeSecurityGroupEgress",
       "ec2:UpdateSecurityGroupRuleDescriptionsIngress", "ec2:UpdateSecurityGroupRuleDescriptionsEgress",
       "ec2:AllocateAddress", "ec2:ReleaseAddress", "ec2:AssociateAddress",
-      "ec2:DisassociateAddress", "ec2:CreateTags", "ec2:DeleteTags"
+      "ec2:DisassociateAddress", "ec2:CreateTags", "ec2:DeleteTags", "ec2:DescribeAccountAttributes",
+      "ec2:DescribeVpcAttribute"
     ]
     resources = ["*"]
   }
@@ -153,7 +154,7 @@ data "aws_iam_policy_document" "github_actions_terraform_policy" {
       "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile",
       "iam:TagInstanceProfile", "iam:UntagInstanceProfile", "iam:ListInstanceProfilesForRole",
       "iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions", "iam:CreatePolicyVersion",
-      "iam:DeletePolicyVersion"
+      "iam:DeletePolicyVersion", "iam:TagPolicy", "iam:UntagPolicy", "iam:ListPolicyTags"
     ]
     resources = [
       "arn:aws:iam::343218214405:role/portfolio-*",
@@ -180,7 +181,8 @@ data "aws_iam_policy_document" "github_actions_terraform_policy" {
     effect = "Allow"
     actions = [
       "s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket",
-      "s3:GetBucketVersioning", "s3:GetBucketAcl", "s3:GetBucketLocation"
+      "s3:GetBucketVersioning", "s3:GetBucketAcl", "s3:GetBucketLocation",
+      "s3:GetEncryptionConfiguration", "s3:GetBucketPublicAccessBlock"
     ]
     resources = [
       "arn:aws:s3:::lopezberg-terraform-state-343218214405-eu-central-1-an",
@@ -212,7 +214,7 @@ data "aws_iam_policy_document" "github_actions_terraform_policy" {
       "ssm:UpdateMaintenanceWindowTarget", "ssm:RegisterTaskWithMaintenanceWindow",
       "ssm:DeregisterTaskFromMaintenanceWindow", "ssm:GetMaintenanceWindowTask",
       "ssm:UpdateMaintenanceWindowTask", "ssm:DescribeMaintenanceWindowTargets",
-      "ssm:DescribeMaintenanceWindowTasks", "ssm:DescribePatchGroups"
+      "ssm:DescribeMaintenanceWindowTasks", "ssm:DescribePatchGroups", "ssm:DescribeMaintenanceWindows"
     ]
     resources = ["*"]
   }
