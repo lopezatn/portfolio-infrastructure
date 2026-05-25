@@ -151,12 +151,16 @@ data "aws_iam_policy_document" "github_actions_terraform_policy" {
       "iam:ListAttachedRolePolicies", "iam:PassRole",
       "iam:GetInstanceProfile", "iam:CreateInstanceProfile", "iam:DeleteInstanceProfile",
       "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile",
-      "iam:TagInstanceProfile", "iam:UntagInstanceProfile", "iam:ListInstanceProfilesForRole"
+      "iam:TagInstanceProfile", "iam:UntagInstanceProfile", "iam:ListInstanceProfilesForRole",
+      "iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions", "iam:CreatePolicyVersion",
+      "iam:DeletePolicyVersion"
     ]
     resources = [
       "arn:aws:iam::343218214405:role/portfolio-*",
       "arn:aws:iam::343218214405:role/github-actions-*",
-      "arn:aws:iam::343218214405:instance-profile/portfolio-*"
+      "arn:aws:iam::343218214405:instance-profile/portfolio-*",
+      "arn:aws:iam::343218214405:policy/portfolio-*",
+      "arn:aws:iam::343218214405:policy/github-actions-*"
     ]
   }
 
