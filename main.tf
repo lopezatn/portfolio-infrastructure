@@ -92,6 +92,150 @@ resource "aws_iam_role_policy" "ec2_s3_scoped" {
   })
 }
 
+resource "aws_iam_role" "github_actions_terraform_role" {
+  name = "github-actions-terraform-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          }
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:lopezatn/portfolio-infrastructure:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+data "aws_iam_policy_document" "github_actions_terraform_policy" {
+  statement {
+    sid       = "EC2"
+    effect    = "Allow"
+    actions   = [
+      "ec2:DescribeImages", "ec2:DescribeInstances", "ec2:DescribeInstanceAttribute",
+      "ec2:DescribeInstanceTypes", "ec2:DescribeInstanceCreditSpecifications",
+      "ec2:DescribeVolumes", "ec2:DescribeSecurityGroups", "ec2:DescribeSecurityGroupRules",
+      "ec2:DescribeAddresses", "ec2:DescribeAddressesAttribute", "ec2:DescribeVpcs",
+      "ec2:DescribeSubnets", "ec2:DescribeNetworkInterfaces", "ec2:DescribeTags",
+      "ec2:RunInstances", "ec2:StartInstances", "ec2:StopInstances", "ec2:TerminateInstances",
+      "ec2:ModifyInstanceAttribute", "ec2:ModifyInstanceMetadataOptions",
+      "ec2:CreateSecurityGroup", "ec2:DeleteSecurityGroup",
+      "ec2:AuthorizeSecurityGroupIngress", "ec2:AuthorizeSecurityGroupEgress",
+      "ec2:RevokeSecurityGroupIngress", "ec2:RevokeSecurityGroupEgress",
+      "ec2:UpdateSecurityGroupRuleDescriptionsIngress", "ec2:UpdateSecurityGroupRuleDescriptionsEgress",
+      "ec2:AllocateAddress", "ec2:ReleaseAddress", "ec2:AssociateAddress",
+      "ec2:DisassociateAddress", "ec2:CreateTags", "ec2:DeleteTags"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "IAM"
+    effect = "Allow"
+    actions = [
+      "iam:GetRole", "iam:CreateRole", "iam:DeleteRole", "iam:UpdateRole",
+      "iam:UpdateRoleDescription", "iam:UpdateAssumeRolePolicy",
+      "iam:TagRole", "iam:UntagRole", "iam:ListRoleTags",
+      "iam:GetRolePolicy", "iam:PutRolePolicy", "iam:DeleteRolePolicy",
+      "iam:ListRolePolicies", "iam:AttachRolePolicy", "iam:DetachRolePolicy",
+      "iam:ListAttachedRolePolicies", "iam:PassRole",
+      "iam:GetInstanceProfile", "iam:CreateInstanceProfile", "iam:DeleteInstanceProfile",
+      "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile",
+      "iam:TagInstanceProfile", "iam:UntagInstanceProfile", "iam:ListInstanceProfilesForRole"
+    ]
+    resources = [
+      "arn:aws:iam::343218214405:role/portfolio-*",
+      "arn:aws:iam::343218214405:role/github-actions-*",
+      "arn:aws:iam::343218214405:instance-profile/portfolio-*"
+    ]
+  }
+
+  statement {
+    sid    = "Route53"
+    effect = "Allow"
+    actions = [
+      "route53:GetHostedZone", "route53:ListHostedZones", "route53:ListHostedZonesByName",
+      "route53:ChangeResourceRecordSets", "route53:GetChange",
+      "route53:ListResourceRecordSets", "route53:ListTagsForResource"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "S3StateBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket",
+      "s3:GetBucketVersioning", "s3:GetBucketAcl", "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::lopezberg-terraform-state-343218214405-eu-central-1-an",
+      "arn:aws:s3:::lopezberg-terraform-state-343218214405-eu-central-1-an/*"
+    ]
+  }
+
+  statement {
+    sid    = "S3DeployBucket"
+    effect = "Allow"
+    actions = ["s3:GetObject", "s3:ListBucket", "s3:GetBucketAcl", "s3:GetBucketLocation"]
+    resources = [
+      "arn:aws:s3:::lopezberg-portfolio-deploy",
+      "arn:aws:s3:::lopezberg-portfolio-deploy/*"
+    ]
+  }
+
+  statement {
+    sid    = "SSM"
+    effect = "Allow"
+    actions = [
+      "ssm:CreatePatchBaseline", "ssm:DeletePatchBaseline", "ssm:GetPatchBaseline",
+      "ssm:UpdatePatchBaseline", "ssm:RegisterPatchBaselineForPatchGroup",
+      "ssm:DeregisterPatchBaselineForPatchGroup", "ssm:GetDefaultPatchBaseline",
+      "ssm:DescribePatchBaselines", "ssm:CreateMaintenanceWindow", "ssm:DeleteMaintenanceWindow",
+      "ssm:GetMaintenanceWindow", "ssm:UpdateMaintenanceWindow", "ssm:ListTagsForResource",
+      "ssm:AddTagsToResource", "ssm:RemoveTagsFromResource",
+      "ssm:RegisterTargetWithMaintenanceWindow", "ssm:DeregisterTargetFromMaintenanceWindow",
+      "ssm:UpdateMaintenanceWindowTarget", "ssm:RegisterTaskWithMaintenanceWindow",
+      "ssm:DeregisterTaskFromMaintenanceWindow", "ssm:GetMaintenanceWindowTask",
+      "ssm:UpdateMaintenanceWindowTask", "ssm:DescribeMaintenanceWindowTargets",
+      "ssm:DescribeMaintenanceWindowTasks", "ssm:DescribePatchGroups"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "OIDC"
+    effect = "Allow"
+    actions = [
+      "iam:GetOpenIDConnectProvider", "iam:CreateOpenIDConnectProvider",
+      "iam:DeleteOpenIDConnectProvider", "iam:TagOpenIDConnectProvider",
+      "iam:UntagOpenIDConnectProvider", "iam:UpdateOpenIDConnectProviderThumbprint",
+      "iam:AddClientIDToOpenIDConnectProvider", "iam:RemoveClientIDFromOpenIDConnectProvider"
+    ]
+    resources = ["arn:aws:iam::343218214405:oidc-provider/*"]
+  }
+}
+
+resource "aws_iam_policy" "github_actions_terraform_policy" {
+  name   = "github-actions-terraform-policy"
+  policy = data.aws_iam_policy_document.github_actions_terraform_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_terraform_policy_attachment" {
+  role       = aws_iam_role.github_actions_terraform_role.name
+  policy_arn = aws_iam_policy.github_actions_terraform_policy.arn
+}
+
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
