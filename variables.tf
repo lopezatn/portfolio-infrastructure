@@ -30,3 +30,9 @@ variable "github_actions_ssm_policy_arn" {
   description = "ARN of the scoped SSM policy for GitHub Actions"
   type        = string
 }
+
+variable "github_owner" {
+  description = "GitHub owner (user or organization) for the repository"
+  type        = string
+  default    = "lopezatn"
+}

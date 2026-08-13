@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
   }
 
   backend "s3" {
@@ -25,6 +29,10 @@ provider "aws" {
       Environment = "Production"
     }
   }
+}
+
+provider "github" {
+  owner = var.github_owner
 }
 
 data "aws_ami" "ubuntu" {
@@ -357,8 +365,8 @@ resource "aws_instance" "portfolio_web" {
 
   metadata_options {
     http_endpoint               = "enabled"
-    http_tokens                 = "required" # IMDSv2 only
-    http_put_response_hop_limit = 1 # Prevents SSRF attacks by limiting hops
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
     instance_metadata_tags      = "enabled"
   }
 
@@ -410,4 +418,13 @@ resource "aws_route53_record" "portfolio_www" {
   type    = "A"
   ttl     = 300
   records = [aws_eip.portfolio_eip.public_ip]
+}
+
+resource "github_repository_environment" "production" {
+  repository  = "portfolio-infrastructure"
+  environment = "production"
+
+  reviewers {
+    users = ["83620071"]
+  }
 }

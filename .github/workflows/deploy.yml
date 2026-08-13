@@ -32,6 +32,7 @@ jobs:
         env:
           TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_github_actions_ssm_policy_arn: ${{ secrets.TF_VAR_GITHUB_ACTIONS_SSM_POLICY_ARN }}
+  # environment: production has a manual approval gate in settings, apply will ONLY run after human approval
   apply:
     name: Apply the new terraform state to AWS
     runs-on: ubuntu-latest
